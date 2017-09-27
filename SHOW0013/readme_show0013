@@ -1,0 +1,6 @@
+Scene 1 sets the custom layer
+    fader 1 = Ch1, fader 2 = Ch2, ...fader24 = ch 24
+Scene 2 sets Fader 1 to max
+Scene 3 sets Fader LR to max
+Scene 4 sets custom layer to Mix and FX
+    see picture for details
