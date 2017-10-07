@@ -13,4 +13,62 @@ Position Value
 21781	0B
 25881	0C
 
+SHOW0011
+Scene 1 
+A1 00 FE 00
+65 20 31 00
+00 00 00 00
+
+FC D9 6E CB
+
+Scene 2 
+A1 00 FE 01
+65 20 32 00
+01 00 00 00
+
+EC C9 65 75
+
+Scene 3
+A1 00 FE 02
+65 20 33 00
+
+00 00 7C 7F
+
+91 1D BF 6F
+
+Scene 4
+A1 00 FE 03
+65 20 34 00
+
+01 00 00 00
+
+D4 D2 D3 79
+
+Szene 5
+A1 00 FE 04
+65 20 35 00
+
+00 00 3B 7F
+
+3C 71 05 AF
+
+
+Scene 7
+A1 00 FE 06
+
+EA B8 BE 74
+
+Scene 8 
+A1 00 FE 07
+65 20 31 00
+
+EA B8 BE 74
+
+Szene 9
+
+A1 00 FE 08
+65 20 32 00
+
+11 4C 68 A7
+
 
