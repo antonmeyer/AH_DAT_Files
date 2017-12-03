@@ -20,7 +20,8 @@
                 "RedirectOutput"
             ]
             //,"args": ["--mutefile", "mutefile27112017.txt"]
-            ,"args": ["--scenenames", "Szenen-Namen.txt"]
+            //,"args": ["--scenenames", "Szenen-Namen.txt"]
+            ,"args": ["--showname", "Die erste Show", "--showdir", "../SHOW0112"]
         },
         {
             "name": "PySpark",

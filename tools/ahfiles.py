@@ -38,7 +38,7 @@ def setSceneName (scenearray, scenename):
     alen = len(a)
     alen = alen & 0xF #limit string lenght
     scenearray[12:12+alen] = a[:alen]
-    scenearray[12+alen+1]=0 #0 terminated string needed???
+    scenearray[12+alen]=0 #0 terminated string needed???
     return
 
 def setSceneNum (scenearray, numstr):
@@ -132,6 +132,27 @@ def processSceneNames():
     return
 # defined command line options
 # this also generates --help and error handling
+
+def writeShowName(ShowName):
+
+    if not os.path.exists(args.showdir):
+        os.makedirs(args.showdir)
+
+    filename = os.path.join(args.showdir,"SHOW.DAT")
+    with open(filename,"w") as ofile:
+        ofile.write(ShowName.ljust(36, chr(0)))
+
+        a = [0] * (36 - len(ShowName))
+        #ofile.write(a)
+        #a.tofile(ofile)
+        #for i in range(1, (36 - len(ShowName))):
+        #    ofile.write("%d % 0")
+        #ShowName.write(ofile)
+
+    return
+
+
+
 CLI=argparse.ArgumentParser()
 CLI.add_argument(
   "--baseScene",  # name on the CLI - drop the `--` for positional/required parameters
@@ -182,7 +203,7 @@ args = CLI.parse_args()
 # access CLI options
 print("baseScene: %r" % args.baseScene)
 print("output: %r" % args.output)
-print("wcrc: %r" % args.wcrc)
+print("showdir %r" % args.showdir)
 
 #block starts with block number and A5 A5 A5
 # might be they claculate CRC block wise
@@ -195,6 +216,10 @@ else:
 # getrennt bearbeitet werden koennen
     if args.scenenames is not None:
         processSceneNames()
+
+if args.showname is not None:
+    writeShowName (args.showname[0])
+
 
 
 #print('crc = {:#010x}'.format(checksum))
