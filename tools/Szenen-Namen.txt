@@ -1,0 +1,22 @@
+1, Lied Warte
+2, Szene 1
+8, Lied Nied scho
+12, instru
+13, Szene 2
+14, Lied Piraten
+19, Lied Engel fallen
+20, instru Geduld
+21, Szene 3
+22, Lied Mir wollen
+25, Lied Gloria
+28, Szene 4
+31, instru
+32, Szene 5
+33, Lied Gwunder
+35, Szene 6
+38, instru
+39, Szene 7
+40, Lied Schluss
+41, Ansage
+
+

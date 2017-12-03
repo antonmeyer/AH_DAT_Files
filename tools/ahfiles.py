@@ -21,7 +21,7 @@ def calcCheckSum (scenearray):
 def updateCheckSum (scenearray):
     "updates the checksum of of a scene data array"
     checksum = calcCheckSum (scenearray)
-    a2 = binascii.unhexlify('%08x' % checksum)
+    a2 = binascii.unhexlify('%08x' % checksum) #format 8 digit with leading 0
     b2 = array('B',a2)
     b2.reverse()
     scenearray[0x651C:0x6520] = b2[0:4]
@@ -76,7 +76,7 @@ def processMuteFile():
         for row in mfreader:
             print ', '.join(row)
             setMuteList(scenearray, row)
-            setSceneName(scenearray,"Scene"+row[0])
+            setSceneName(scenearray,"s"+row[0])
             filenr = format(int(row[0]), '03d') #first line is scenenumber
             writeSceneFile(scenearray,filenr)
     return
@@ -89,8 +89,47 @@ def setMuteList(scenearray, mutelist):
         scenearray[0xb8 + i*0xC0] = int(mutelist[i+1]) #first col is scene number
     return
 
+def insertSceneafter(numstr):
+    "insert new scenefile and shifts the following up"
+    #we work reverse, starting with the highest file number
+    #increase the file number in name in internaly 
+    #write the new file and decrease file number, until we have
+    # increased the given numstr file
+    # find the highest file number via sort?
+    # gererischer Ansatz: erst mal File namen anpassen und dann 
+    # interne file nummer und crc anpassen
+    # problem: interen Scene Namen, wenn der durch nummeriert ist
+    # automatisch erkennen und anpassen???
+    
 
+    filename = os.path.join(args.showdir,"SCENE" + numstr +".DAT")
+    with open(filename, 'w') as ofile:
+        scenearray.tofile(ofile)
 
+    return
+
+def processSceneNames():
+
+    with open(args.scenenames, 'r') as scnamefile:
+        sfreader = csv.reader(scnamefile, delimiter=',')
+        #iterate thru mute file lines
+        for row in sfreader:
+            print ', '.join(row)
+            try:
+                numstr = format(int(row[0]), '03d')
+                filename = os.path.join(args.showdir,"SCENE" + numstr +".DAT")
+                with open(filename, 'r') as ifile:
+                    sa = ifile.read()
+                    scenearray = array('B', sa)
+                    setSceneName(scenearray,row[1])
+            
+                writeSceneFile(scenearray, numstr)
+            except:
+                print "empty line"
+                
+            #writeSceneFile(scenearray,filenr)
+
+    return
 # defined command line options
 # this also generates --help and error handling
 CLI=argparse.ArgumentParser()
@@ -107,7 +146,7 @@ CLI.add_argument(
 )
 CLI.add_argument(
  "--showdir",  
- nargs=1,  # 1 dir name
+ #nargs=1,  # 1 dir name list of 1 element
  default="../SHOW0111",  # default if nothing is provided
  help="directory for the operation"
 )
@@ -115,6 +154,11 @@ CLI.add_argument(
  "--scenename",
  nargs=1,  # a name
  help="scene name, for a single Scene File",
+)
+CLI.add_argument(
+ "--scenenames",
+ #nargs=1,  # a name
+ help="file name, comma seperated, scene number, Scene Name",
 )
 CLI.add_argument(
  "--showname", 
@@ -146,6 +190,11 @@ print("wcrc: %r" % args.wcrc)
 
 if args.mutefile is not None:
      processMuteFile()
+else:
+# eventuell etwas besser Steuerung, damit Mutefile und Szene Names zusammen aber auch 
+# getrennt bearbeitet werden koennen
+    if args.scenenames is not None:
+        processSceneNames()
 
 
 #print('crc = {:#010x}'.format(checksum))
