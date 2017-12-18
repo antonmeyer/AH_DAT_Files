@@ -6,6 +6,8 @@ import binascii
 from array import array
 import argparse
 import csv
+import glob
+import re
 
 def calcCheckSum (scenearray):
     "retuns the CheckSum of a Scene filedata array"
@@ -36,10 +38,34 @@ def setSceneName (scenearray, scenename):
     #0 terminated string vermutlich 10 oder 11 Zeichen, max 63
     a = array('B', scenename)
     alen = len(a)
-    alen = alen & 0xF #limit string lenght
+    if alen > 14:
+        alen = 14 #Scene Name limit from the description
+    #alen = alen & 0xF #limit string lenght
     scenearray[12:12+alen] = a[:alen]
     scenearray[12+alen]=0 #0 terminated string needed???
     return
+
+def getSceneName (scenearray):
+    "returns the Scene Name from scenearray"
+    namestr = scenearray[12:12+14].tostring()
+    #namestr = "".join(aname)
+    name = namestr.split('\x00',1)[0]
+    return name
+
+def getAllSceneNames():
+    "lists all Scene Names of a Show"
+    filefilter = os.path.join(args.showdir, 'SCENE???.DAT')
+    datfiles = glob.glob(filefilter)
+    datfiles.sort()
+
+    for datfile in datfiles:
+        with open(datfile,'r') as file:
+            sa = file.read()
+            scenearray = array('B', sa)
+    
+        scenename = getSceneName(scenearray)
+        print (scenename)
+
 
 def setSceneNum (scenearray, numstr):
     "set the scene number, should be unique in 1 show and fit to the filename"
@@ -56,6 +82,31 @@ def writeSceneFile (scenearray, numstr):
         scenearray.tofile(ofile)
 
     return
+
+def getAllMutes():
+    "prints all muted channels (1-24)"
+    filefilter = os.path.join(args.showdir, 'SCENE???.DAT')
+    datfiles = glob.glob(filefilter)
+    datfiles.sort()
+
+    for datfile in datfiles:
+        #get the mute settings of one file
+        with open(datfile,'r') as file:
+            sa = file.read()
+            scenearray = array('B', sa)
+
+        mutelist = getMuteList(scenearray)
+        print mutelist
+
+
+
+def getMuteList(scenearray):
+
+    mutelist = range(24)
+    for i in range(0,24):
+       mutelist[i] = scenearray[0xb8 + i*0xC0]
+
+    return mutelist
 
 def processMuteFile():
     "reads the file given at cmd line arg --mutefile and generates the scenefiles"
@@ -85,15 +136,16 @@ def processMuteFile():
 def setMuteList(scenearray, mutelist):
     "set all 24 mute as in the mutelist of 0 and 1"
     #ToDocheck data types, number of mute channels,
-    for i in range(0,3):
+    for i in range(0,24):
         scenearray[0xb8 + i*0xC0] = int(mutelist[i+1]) #first col is scene number
     return
 
-def insertSceneafter(numstr):
+def insertSceneBefore(scenenr):
     "insert new scenefile and shifts the following up"
     #we work reverse, starting with the highest file number
-    #increase the file number in name in internaly 
-    #write the new file and decrease file number, until we have
+    #increase the file number in name and internaly 
+    # adapt the scene name for short names (sxy)
+    # write the new file and decrease file number-idx, until we have
     # increased the given numstr file
     # find the highest file number via sort?
     # gererischer Ansatz: erst mal File namen anpassen und dann 
@@ -101,10 +153,30 @@ def insertSceneafter(numstr):
     # problem: interen Scene Namen, wenn der durch nummeriert ist
     # automatisch erkennen und anpassen???
     
+    filefilter = os.path.join(args.showdir, 'SCENE???.DAT')
+    datfiles = glob.glob(filefilter)
+    datfiles.sort()
+    #process files in revers order
+    for datfile in reversed(datfiles):
+        datname= os.path.split(datfile)[1]
+        filenumstr = re.search(r'\d+',datname).group(0)
+        filenr = int(filenumstr)
+        if filenr < int(scenenr):
+            break
 
-    filename = os.path.join(args.showdir,"SCENE" + numstr +".DAT")
-    with open(filename, 'w') as ofile:
-        scenearray.tofile(ofile)
+        newfilenumstr= format( filenr +1, '03d')
+            
+        with open(datfile,'r') as oldfile:
+            sa = oldfile.read()
+            scenearray = array('B', sa)
+
+        scenename = getSceneName(scenearray)
+
+        if len(scenename) < 4 :
+            #we have a short name, assume it is the scene number
+            setSceneName(scenearray, "s"+ format(filenr +2,'d'))
+
+        writeSceneFile (scenearray, newfilenumstr)
 
     return
 
@@ -152,11 +224,10 @@ def writeShowName(ShowName):
     return
 
 
-
 CLI=argparse.ArgumentParser()
 CLI.add_argument(
-  "--baseScene",  # name on the CLI - drop the `--` for positional/required parameters
-  nargs=1,  # 1 input file
+  "--baseScene",  #
+  #nargs=1,  # 1 input file
   default="../SHOW0011/SCENE000.DAT",  # default if nothing is provided
   help="Scene.DAT file as base for the operation",
 )
@@ -173,7 +244,7 @@ CLI.add_argument(
 )
 CLI.add_argument(
  "--scenename",
- nargs=1,  # a name
+ #nargs=1,  # a name
  help="scene name, for a single Scene File",
 )
 CLI.add_argument(
@@ -183,7 +254,7 @@ CLI.add_argument(
 )
 CLI.add_argument(
  "--showname", 
- nargs=1,  # 1 name
+ #nargs=1,  # 1 name
  help="set the show name",
 )
 CLI.add_argument(
@@ -197,6 +268,21 @@ nargs='?',
 const="./mutefile.csv",
 help="mute file; comma seperated table; first col is scene number, followed by channels mute= 1, not mute = 0"
 )
+CLI.add_argument(
+ "--addbefore", 
+ help= "copy the give scene before",
+)
+CLI.add_argument(
+"--getSceneNames",
+help= "lists all SceneNames of a Show",
+action='store_true', #flag, default false
+)
+CLI.add_argument(
+"--getMutes",
+help= "lists all Mutes of a Show",
+action='store_true', #flag, default false
+)
+
 
 # parse the command line
 args = CLI.parse_args()
@@ -218,8 +304,16 @@ else:
         processSceneNames()
 
 if args.showname is not None:
-    writeShowName (args.showname[0])
+    writeShowName (args.showname)
 
+if args.addbefore is not None:
+    insertSceneBefore(args.addbefore)
+
+if args.getSceneNames is True:
+    getAllSceneNames()
+
+if args.getMutes is True:
+    getAllMutes()
 
 
 #print('crc = {:#010x}'.format(checksum))

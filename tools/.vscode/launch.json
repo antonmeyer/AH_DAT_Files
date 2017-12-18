@@ -21,7 +21,8 @@
             ]
             //,"args": ["--mutefile", "mutefile27112017.txt"]
             //,"args": ["--scenenames", "Szenen-Namen.txt"]
-            ,"args": ["--showname", "Die erste Show", "--showdir", "../SHOW0112"]
+            //,"args": ["--addbefore", "4","--showdir", "../SHOW0022"]
+            ,"args": ["--getMutes","--showdir", "../SHOW0022"]
         },
         {
             "name": "PySpark",
