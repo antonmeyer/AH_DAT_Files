@@ -83,8 +83,8 @@ def writeSceneFile (scenearray, numstr):
 
     return
 
-def getAllMutes():
-    "prints all muted channels (1-24)"
+def getAllValuesAt(parapos):
+    "prints for all scenes values at parameter position for  channels (1-24)"
     filefilter = os.path.join(args.showdir, 'SCENE???.DAT')
     datfiles = glob.glob(filefilter)
     datfiles.sort()
@@ -95,18 +95,16 @@ def getAllMutes():
             sa = file.read()
             scenearray = array('B', sa)
 
-        mutelist = getMuteList(scenearray)
-        print mutelist
+        vallist = get24ValueAt(scenearray,parapos)
+        print vallist
 
-
-
-def getMuteList(scenearray):
-
-    mutelist = range(24)
+def get24ValueAt(scenearray, parapos):
+    "get Value at parameter position for 24 CHannels "
+    vallist = range(24)
     for i in range(0,24):
-       mutelist[i] = scenearray[0xb8 + i*0xC0]
+       vallist[i] = scenearray[parapos + i*0xC0]
 
-    return mutelist
+    return vallist
 
 def processMuteFile():
     "reads the file given at cmd line arg --mutefile and generates the scenefiles"
@@ -223,6 +221,9 @@ def writeShowName(ShowName):
 
     return
 
+    # CH 2 Fader auf bytepos 367 0x8A = 138 (show15 scene007.dat)
+    # CH 1 Fader; 175 0x8A (show15, scene006.dat) -> 175 + 192
+    # CH 1 Mute at  = 184
 
 CLI=argparse.ArgumentParser()
 CLI.add_argument(
@@ -282,6 +283,12 @@ CLI.add_argument(
 help= "lists all Mutes of a Show",
 action='store_true', #flag, default false
 )
+CLI.add_argument(
+"--getFaders",
+help= "lists all Faders of a Show",
+action='store_true', #flag, default false
+)
+
 
 
 # parse the command line
@@ -313,8 +320,10 @@ if args.getSceneNames is True:
     getAllSceneNames()
 
 if args.getMutes is True:
-    getAllMutes()
+    getAllValuesAt(0xb8)
 
+if args.getFaders is True:
+    getAllValuesAt(175)
 
 #print('crc = {:#010x}'.format(checksum))
 #a1 = getCheckSum(ba1)

@@ -22,7 +22,7 @@
             //,"args": ["--mutefile", "mutefile27112017.txt"]
             //,"args": ["--scenenames", "Szenen-Namen.txt"]
             //,"args": ["--addbefore", "4","--showdir", "../SHOW0022"]
-            ,"args": ["--getMutes","--showdir", "../SHOW0022"]
+            ,"args": ["--getFaders","--showdir", "../SHOW0022"]
         },
         {
             "name": "PySpark",
