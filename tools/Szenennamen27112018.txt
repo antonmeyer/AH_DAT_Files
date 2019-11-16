@@ -1,0 +1,25 @@
+1, MicTest
+2, Ansage, Instr.
+3, 1. Szene
+4, Song Herdmanns
+8, Mute Szene 2
+9, Lied Verloore
+15, Instrumental
+16, 3. Szene
+23, Lied Katastro
+25, 4. Szene
+31, 5. Szene
+32, Lied Gloria 1
+37, Lied Rap
+41, 6. Szene
+42, Lied Warum
+45, Instrumental
+46, 7. Szene
+52, Lied Lampe 1
+54, Lied Lampe 2
+56, 8. Szene
+62, Lied Gloria 2
+63, Instrumental
+65, Lied Wer hatt 
+66, Schluss
+67, Ansage
