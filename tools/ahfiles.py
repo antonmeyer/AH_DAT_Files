@@ -209,7 +209,7 @@ def insertSceneBefore(scenenr):
 
 def processSceneNames():
 
-    with open(args.scenenames, 'r') as scnamefile:
+    with open(args.scenenames, 'rU') as scnamefile:
         sfreader = csv.reader(scnamefile, delimiter=',')
         #iterate thru mute file lines
         for row in sfreader:
@@ -258,7 +258,7 @@ CLI = argparse.ArgumentParser()
 CLI.add_argument(
     "--baseScene",  #
   #nargs=1,  # 1 input file
-    default="/Users/daubi/Documents/Kolibri/2018/AHQU/SHOWS/SHOW0002",  # default if nothing is provided
+    default="./SCENE000.DAT",  # default if nothing is provided
     help="Scene.DAT file as base for the operation",
 )
 CLI.add_argument(
