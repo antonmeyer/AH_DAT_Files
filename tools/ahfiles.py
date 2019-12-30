@@ -148,7 +148,7 @@ def processMuteFile():
 
     # make a copy of the microphone test file
     
-    with open(args.mutefile, 'rb') as mutefile:
+    with open(args.mutefile, 'rUb') as mutefile:
         mfreader = csv.reader(mutefile, delimiter=' ')
         #iterate thru mute file lines
         for row in mfreader:
