@@ -152,6 +152,7 @@ def processMuteFile():
         mfreader = csv.reader(mutefile, delimiter=' ')
         #iterate thru mute file lines
         for row in mfreader:
+          if (len(row) > 24):
             print ', '.join(row)
             setMuteList(scenearray, row)
             setSceneName(scenearray, "s"+row[0])
@@ -229,8 +230,6 @@ def processSceneNames():
             #writeSceneFile(scenearray,filenr)
 
     return
-# defined command line options
-# this also generates --help and error handling
 
 def writeShowName(ShowName):
 
@@ -250,9 +249,13 @@ def writeShowName(ShowName):
 
     return
 
+
     # CH 2 Fader auf bytepos 367 0x8A = 138 (show15 scene007.dat)
     # CH 1 Fader; 175 0x8A (show15, scene006.dat) -> 175 + 192
     # CH 1 Mute at  = 184
+    
+# defined command line options
+# this also generates --help and error handling
 
 CLI = argparse.ArgumentParser()
 CLI.add_argument(
