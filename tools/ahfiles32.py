@@ -126,16 +126,16 @@ def getAllValuesAt(parapos):
 
     for datfile in datfiles:
         #get the mute settings of one file
-        with open(datfile, 'r') as file:
-            sa = file.read()
-            scenearray = array('B', sa)
+        file = open(datfile, 'rb')
+        sa = file.read()
+        scenearray = array('B', sa)
 
-        vallist = get_allValueAt(scenearray, parapos)
-        print (vallist)
+        vallist = get_allValueAt_fromScene(scenearray, parapos)
+        print (vallist.hex() )
 
-def get_allValueAt(scenearray, parapos):
-    "get Value at parameter position for all CHannels "
-    vallist = range(maxColumn)
+def get_allValueAt_fromScene(scenearray, parapos):
+    "get Value at parameter position for all CHannels from given scene"
+    vallist = bytearray(maxColumn)
     for i in range(0, maxColumn):
         vallist[i] = scenearray[parapos + i*0xC0]
 
@@ -256,6 +256,38 @@ def writeShowName(ShowName):
     return
 
 
+def setFaders_forScene(scenearray, row):
+    "set all mute as in the mutelist 0 or 1"
+    #ToDocheck data types, number of mute channels,
+    for i in range(1, len(row)): #first col is scenenumber, we want values
+        scenearray[175+ (i-1)*0xC0] = int(row[i],16) #first col is scene number
+    return
+
+def setFaders_forShow(faderfile):
+    "reads the file given at cmd line arg --setFaders and generates the scenefiles"
+    #open template scenefile = microfone test
+    with open(args.baseScene, 'rb') as baseScene:
+        sa = baseScene.read()
+        scenearray = bytearray(sa)
+    if not os.path.exists(args.showdir):
+        os.makedirs(args.showdir)
+
+    # make a copy of the microphone test file
+    
+    with open(args.setFaders, 'rtU') as faderfile:
+
+        mfreader = csv.reader(faderfile, delimiter=' ')
+        #iterate thru mute file lines
+        for row in mfreader:
+          if (len(row) > 24): #we might check if we realy instist on this minimum
+            print (', '.join(row))
+            setFaders_forScene(scenearray, row)
+            setSceneName(scenearray, "s"+row[0])
+            filenr = format(int(row[0]), '03d') #first col is scenenumber
+            writeSceneFile(scenearray, filenr)
+    return
+
+
     # CH 2 Fader auf bytepos 367 0x8A = 138 (show15 scene007.dat)
     # CH 1 Fader; 175 0x8A (show15, scene006.dat) -> 175 + 192
     # CH 1 Mute at  = 184
@@ -326,7 +358,12 @@ CLI.add_argument(
 help= "lists all Faders of a Show",
 action='store_true', #flag, default false
 )
-
+CLI.add_argument(
+"--setFaders",
+nargs='?',
+const="./faders.txt",
+help="fader file; comma seperated table; first col is scene number, followed by channels mute= 1, not mute = 0"
+)
 
 
 # parse the command line
@@ -362,6 +399,9 @@ if args.getMutes is True:
 
 if args.getFaders is True:
     getAllValuesAt(175)
+
+if args.setFaders is not None:
+    setFaders_forShow(args.setFaders)
 
 #print('crc = {:#010x}'.format(checksum))
 #a1 = getCheckSum(ba1)
