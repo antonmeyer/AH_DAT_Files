@@ -81,8 +81,7 @@ def setSceneName(scenearray, scenename):
 
 def getSceneName(scenearray):
     "returns the Scene Name from scenearray"
-    namestr = scenearray[12:12+14].tostring()
-    #namestr = "".join(aname)
+    namestr = scenearray[12:12+14].decode("UTF-8")
     name = namestr.split('\x00', 1)[0]
     return name
 
@@ -93,9 +92,9 @@ def getAllSceneNames():
     datfiles.sort()
 
     for datfile in datfiles:
-        with open(datfile, 'r') as file:
+        with open(datfile, 'rb') as file:
             sa = file.read()
-            scenearray = array('B', sa)
+            scenearray = bytearray(sa)
 
         scenename = getSceneName(scenearray)
         print (scenename)
@@ -161,7 +160,7 @@ def processMuteFile():
             print (', '.join(row))
             setMuteList(scenearray, row)
             setSceneName(scenearray, "s"+row[0])
-            filenr = format(int(row[0]), '03d') #first col is scenenumber
+            filenr = format(int(row[0])-1, '03d') #first col is scenenumber, internal starts with 0
             writeSceneFile(scenearray, filenr)
     return
 
@@ -200,9 +199,9 @@ def insertSceneBefore(scenenr):
 
         newfilenumstr = format(filenr +1, '03d')
 
-        with open(datfile, 'r') as oldfile:
+        with open(datfile, 'rb') as oldfile:
             sa = oldfile.read()
-            scenearray = array('B', sa)
+            scenearray = bytearray(sa)
 
         scenename = getSceneName(scenearray)
 
@@ -222,16 +221,16 @@ def processSceneNames():
         for row in sfreader:
             print (', '.join(row))
             try:
-                numstr = format(int(row[0]), '03d')
+                numstr = format(int(row[0])-1, '03d') #internal numbering starts at 0
                 filename = os.path.join(args.showdir, "SCENE" + numstr + ".DAT")
-                with open(filename, 'r') as ifile:
-                    sa = ifile.read()
-                    scenearray = array('B', sa)
+                with open(filename, 'rb') as ifile:
+                    srcarray = ifile.read()
+                    scenearray = bytearray(srcarray)
                     setSceneName(scenearray, row[1])
 
                 writeSceneFile(scenearray, numstr)
-            except:
-                print ("empty line")
+            except Exception as err:
+                print (err)
 
             #writeSceneFile(scenearray,filenr)
 
@@ -283,7 +282,7 @@ def setFaders_forShow(faderfile):
             print (', '.join(row))
             setFaders_forScene(scenearray, row)
             setSceneName(scenearray, "s"+row[0])
-            filenr = format(int(row[0]), '03d') #first col is scenenumber
+            filenr = format(int(row[0])-1, '03d') #first col is scenenumber, starts internal with 0
             writeSceneFile(scenearray, filenr)
     return
 

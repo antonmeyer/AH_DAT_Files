@@ -20,10 +20,13 @@
                 "RedirectOutput"
             ]
             //,"args": ["--mutefile", "mutefile27112017.txt"]
-            //,"args": ["--getSceneNames", "--showdir", "~/Downloads/SHOW0111/"]
+            //,"args": ["--getSceneNames", "--showdir", "/Users/daubi/Documents/Kolibri/2021/testshow"]
             //,"args": ["--addbefore", "4","--showdir", "../SHOW0022"]
-            //,"args": ["--getFaders","--showdir", "../SHOW0022"]
-            ,"args": ["--baseScene",  "./AHQU/SHOWS/SHOW0001/SCENE000.DAT", "--showdir", "./testshow", "--mutefile", "./mutefile151121.txt"]
+            //,"args": ["--getFaders","--showdir", "./testshow"]
+            //,"args": ["--baseScene",  "./AHQU/SHOWS/SHOW0001/SCENE000.DAT", "--showname", "testFadres", "--setFaders", "./faders.txt", "--showdir", "./testshow2"]
+            //,"args": ["--baseScene",  "./AHQU/SHOWS/SHOW0001/SCENE000.DAT", "--showdir", "./testshow", "--mutefile", "./mutefile151121.txt"]
+            //"args": ["--showdir", "/Users/daubi/Documents/Kolibri/2021/testshow", "--scenenames", "SzenenNamen20211128.txt"]
+            ,"args": ["--addbefore", "1", "--showdir", "./testshow"]
         },
         {
             "name": "PySpark",
