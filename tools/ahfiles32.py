@@ -97,7 +97,7 @@ def getAllSceneNames():
             scenearray = bytearray(sa)
 
         scenename = getSceneName(scenearray)
-        print (scenename)
+        print (datfile, scenename)
 
 
 def setSceneNum(scenearray, numstr):
@@ -181,7 +181,7 @@ def insertSceneBefore(scenenr):
     # write the new file and decrease file number-idx, until we have
     # increased the given numstr file
     # find the highest file number via sort?
-    # gererischer Ansatz: erst mal File namen anpassen und dann 
+    # generischer Ansatz: erst mal File namen anpassen und dann 
     # interne file nummer und crc anpassen
     # problem: interen Scene Namen, wenn der durchnummeriert ist
     # automatisch erkennen und anpassen???
@@ -361,7 +361,7 @@ CLI.add_argument(
 "--setFaders",
 nargs='?',
 const="./faders.txt",
-help="fader file; comma seperated table; first col is scene number, followed by channels mute= 1, not mute = 0"
+help="fader file; comma seperated table; first col is scene number, followed by channels values 0..255"
 )
 
 
